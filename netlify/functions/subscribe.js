@@ -31,7 +31,7 @@ exports.handler = async (event) => {
     return { statusCode: 500, body: JSON.stringify({ error: "Server configuration error" }) };
   }
 
-  const contactPayload = { email_address: email, status: "subscribed", tags: [TAG] };
+const contactPayload = { email_address: email, status: "pending", tags: [TAG] };
   if (firstName) contactPayload.fields = { FirstName: firstName };
 
   try {
