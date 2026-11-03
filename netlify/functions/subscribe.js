@@ -10,13 +10,19 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
-  let email, firstName;
+  let email, firstName, website;
   try {
     const body = JSON.parse(event.body);
     email = (body.email || "").trim().toLowerCase();
     firstName = (body.firstName || "").trim();
+    website = (body.website || "").trim();
   } catch (err) {
     return { statusCode: 400, body: JSON.stringify({ error: "Invalid request body" }) };
+  }
+
+  if (website) {
+    // Honeypot filled in: almost certainly a bot. Pretend it worked.
+    return { statusCode: 200, body: JSON.stringify({ success: true }) };
   }
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -31,7 +37,7 @@ exports.handler = async (event) => {
     return { statusCode: 500, body: JSON.stringify({ error: "Server configuration error" }) };
   }
 
-const contactPayload = { email_address: email, status: "pending", tags: [TAG] };
+  const contactPayload = { email_address: email, status: "pending", tags: [TAG] };
   if (firstName) contactPayload.fields = { FirstName: firstName };
 
   try {
