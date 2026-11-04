@@ -215,6 +215,7 @@ button {
   .checklist { grid-template-columns: auto; }
 }
 </style>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 <main>
@@ -252,6 +253,7 @@ button {
       <div class="hp" aria-hidden="true">
         <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
       </div>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAFzfAyLCEWCbLJeF"></div>
       <button type="submit" class="submit">enter</button>
       <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
     </form>
@@ -300,7 +302,8 @@ button {
       body: JSON.stringify({
         firstName: form.elements['name'].value,
         email: form.elements['email'].value,
-        website: form.elements['website'].value
+        website: form.elements['website'].value,
+        turnstileToken: form.elements['cf-turnstile-response'] ? form.elements['cf-turnstile-response'].value : ''
       })
     })
       .then(function (res) {
@@ -309,6 +312,7 @@ button {
       .then(function (result) {
         if (result.ok && result.data.success) {
           form.reset();
+          if (window.turnstile) turnstile.reset();
           submitBtn.textContent = result.data.alreadySubscribed ? 'already on the list' : 'done';
           statusEl.textContent = result.data.alreadySubscribed
             ? 'You are already on the list.'
@@ -320,6 +324,7 @@ button {
       .catch(function (err) {
         submitBtn.disabled = false;
         submitBtn.textContent = originalLabel;
+        if (window.turnstile) turnstile.reset();
         statusEl.textContent = err.message && err.message !== 'error' && err.message !== 'Failed to fetch'
           ? err.message
           : 'Something went wrong. Please try again.';
